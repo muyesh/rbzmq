@@ -352,7 +352,7 @@ static VALUE internal_select(VALUE argval)
         poll_args.nitems = ps.nitems;
         poll_args.timeout_usec = arg->timeout_usec;
 
-        rb_thread_blocking_region (zmq_poll_blocking, (void*)&poll_args, NULL, NULL);
+        rb_thread_call_without_gvl (zmq_poll_blocking, (void*)&poll_args, NULL, NULL);
         rc = poll_args.rc;
     }
     else
@@ -1625,7 +1625,7 @@ static VALUE socket_send (int argc_, VALUE* argv_, VALUE self_)
         send_args.socket = s->socket;
         send_args.msg = &msg;
         send_args.flags = flags;
-        rb_thread_blocking_region (zmq_send_blocking, (void*) &send_args, NULL, NULL);
+        rb_thread_call_without_gvl (zmq_send_blocking, (void*) &send_args, NULL, NULL);
         rc = send_args.rc;
     }
     else
@@ -1709,7 +1709,7 @@ static VALUE socket_recv (int argc_, VALUE* argv_, VALUE self_)
         recv_args.socket = s->socket;
         recv_args.msg = &msg;
         recv_args.flags = flags;
-        rb_thread_blocking_region (zmq_recv_blocking, (void*) &recv_args,
+        rb_thread_call_without_gvl (zmq_recv_blocking, (void*) &recv_args,
             NULL, NULL);
         rc = recv_args.rc;
     }
